@@ -8,22 +8,50 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.IntStream;
 
 public class CompletableFutureAndHigherOrderFunctions
 {
 	static AtomicInteger ai = new AtomicInteger(5);
 
+	public static String firstMethod(String msg) {
+		return "first method : " + msg;
+	}
+	
+	public static String secondMethod(String msg) {
+		return "second method : " + msg;
+	}
+	
+	public static String thirdMethod(String msg) {
+		return "third method : " + msg;
+	}
+	
 	public static void main(String[] args)
 	{
-		String sample = "RAdhe";
-		System.out.println("Calling operators");
-		List<String> operatedStrings = getOperatedStrings(sample);
-		System.out.println(operatedStrings);
+		
+		String sample = "Hello!!!";
+		
 		System.out.println("Calling suppliers");
 		List<String> resultedStrings = supplierExample(sample);
 		System.out.println(resultedStrings);
+		addSeparator();
+		sleep(2000);
+		System.out.println("Calling operators");
+		List<String> operatedStrings = getOperatedStrings(sample);
+		System.out.println(operatedStrings);
+		
 
+	}
+
+	private static void addSeparator()
+	{
+		System.out.println();
+		System.out.println();
+		IntStream.range(0, 100).forEach(i -> System.out.print("*"));
+		System.out.println();
+		IntStream.range(0, 100).forEach(i -> System.out.print("*"));
+		System.out.println();
+		System.out.println();
 	}
 
 	private static List<String> getOperatedStrings(String sample)
@@ -31,11 +59,11 @@ public class CompletableFutureAndHigherOrderFunctions
 		ai.set(5);
 		CompletableFuture<String> future = CompletableFuture.completedFuture(sample);
 		List<Function<String, String>> stringFunctions = new ArrayList<>();
-		stringFunctions.add(wait(StringUtils::upperCase));
+		stringFunctions.add(wait(CompletableFutureAndHigherOrderFunctions::firstMethod));
 		System.out.println("Checkpoint 1");
-		stringFunctions.add(wait(StringUtils::lowerCase));
+		stringFunctions.add(wait(CompletableFutureAndHigherOrderFunctions::secondMethod));
 		System.out.println("Checkpoint 2");
-		stringFunctions.add(wait(Function.identity()));
+		stringFunctions.add(wait(CompletableFutureAndHigherOrderFunctions::thirdMethod));
 		System.out.println("Checkpoint 3");
 		List<CompletableFuture<String>> futures = stringFunctions.stream().map(fun -> future.thenApplyAsync(fun))
 				.collect(Collectors.toList());
@@ -68,9 +96,9 @@ public class CompletableFutureAndHigherOrderFunctions
 	{
 		ai.set(5);
 		List<Supplier<String>> stringFunctions2 = new ArrayList<>();
-		stringFunctions2.add(supplier(StringUtils.upperCase(sample)));
-		stringFunctions2.add(supplier(StringUtils.lowerCase(sample)));
-		stringFunctions2.add(supplier(sample));
+		stringFunctions2.add(supplier(firstMethod(sample)));
+		stringFunctions2.add(supplier(secondMethod(sample)));
+		stringFunctions2.add(supplier(thirdMethod(sample)));
 		List<CompletableFuture<String>> collect = stringFunctions2.stream()
 				.map(supplier -> CompletableFuture.supplyAsync(supplier))
 				.collect(Collectors.toList());
@@ -98,5 +126,18 @@ public class CompletableFutureAndHigherOrderFunctions
 			}
 			return string;
 		};
+	}
+	
+	private static void sleep(long duration)
+	{
+			try
+			{
+				Thread.sleep(duration);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 }

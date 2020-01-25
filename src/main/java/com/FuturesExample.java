@@ -1,50 +1,41 @@
 package com;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Future class represents a future result of an asynchronous computation – a
+ * Future class represents a future result of an asynchronous computation ï¿½ a
  * result that will eventually appear in the Future after the processing is
  * complete.
  * 
  *
  */
+@Slf4j
 public class FuturesExample
 {
-	public static void main(String[] args)
+	SquareCalculator squareCalculator;
+	public Long fetch(int integer)
 	{
-		SquareCalculator squareCalculator = new SquareCalculator();
-		Future<Integer> futureValue = squareCalculator.calculate(12);
+		Long result = 0L;
+		Future<Long> futureValue = squareCalculator.submit(integer);
 		try
 		{
-			squareCalculator.executor.shutdown();
-			System.out.println(futureValue.get());
-			System.out.println("main: " + Thread.currentThread());
-			squareCalculator.executor.awaitTermination(5, TimeUnit.SECONDS);
+			doSomeTediuosTask();
+			log.info("getting result from future");
+			result = futureValue.get();
+			log.info("result aquired {}", result);
 		}
 		catch (InterruptedException | ExecutionException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException("operation was not completed succesfully", e);
 		}
+		return result;
 	}
-}
-
-class SquareCalculator
-{
-
-	ExecutorService executor = Executors.newSingleThreadExecutor();
-
-	public Future<Integer> calculate(Integer input)
-	{
-		return executor.submit(() -> {
-			System.out.println("calculate: " + Thread.currentThread());
-			Thread.sleep(1000);
-			return input * input;
-		});
+	private void doSomeTediuosTask() throws InterruptedException {
+		log.info("Doing a tediuos task");
+		Thread.sleep(2000);
+		log.info("Tediuos task completed");
 	}
 }

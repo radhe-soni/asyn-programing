@@ -1,7 +1,9 @@
-package com;
+package com.future;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import com.SquareCalculator;
 
 import lombok.extern.slf4j.Slf4j;
 

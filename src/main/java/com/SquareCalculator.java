@@ -1,5 +1,6 @@
 package com;
 
+import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -20,11 +21,26 @@ public class SquareCalculator {
 		return executor.submit(() -> calculate(input));
 	}
 
-	public Long calculate(Integer input) throws InterruptedException {
-		log.info("executing calculate asynchronously in");
-		Thread.sleep(1000);
+	public Long calculate(Integer input){
+		sleep(1);
 		Long result = (long) (input * input);
 		log.info("exiting calculate");
 		return result;
+	}
+
+	public BigInteger calculate(Long input){
+		sleep(2);
+		BigInteger result = BigInteger.valueOf(input).multiply(BigInteger.valueOf(input));
+		log.info("exiting calculate");
+		return result;
+	}
+
+	private void sleep(long seconds) {
+		log.info("executing calculate asynchronously in");
+		try {
+			Thread.sleep(seconds * 1000);
+		} catch (InterruptedException e) {
+			log.error("My sleep was interrupted");
+		}
 	}
 }

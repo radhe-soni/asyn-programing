@@ -1,9 +1,11 @@
-package com
+package com.future
 
 
 import static org.junit.Assert.*
 
 import java.util.concurrent.TimeUnit
+
+import com.SquareCalculator
 
 import spock.lang.Specification
 

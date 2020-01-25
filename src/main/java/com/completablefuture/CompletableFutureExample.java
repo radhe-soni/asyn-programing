@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.SquareCalculator;
 
@@ -26,7 +28,7 @@ public class CompletableFutureExample {
 		CompletableFuture<BigInteger> ftrInSeparatePoolWithRsltSquared = getFtrInSeparatePoolWithRsltSquared(integer1,
 				pool);
 		doSomeTediuosTask();
-		List<Number> values = completeAllFutureSequencially(cmnPoolFuture, cmnPoolFtrWithRsltSquared,
+		List<Number> values = completeAllFuturesIndependently(cmnPoolFuture, cmnPoolFtrWithRsltSquared,
 				futureInSeparatePool, ftrInSeparatePoolWithRsltSquared);
 		System.out.println(values);
 		return values;
@@ -56,11 +58,18 @@ public class CompletableFutureExample {
 		Thread.sleep(1000);
 		log.info("Tediuos task completed");
 	}
-
-	private static List<Number> completeAllFutureSequencially(CompletableFuture<Long> completableFuture1,
+	//Demonstration purpose only, don't try this on your code.
+	private static List<Number> completeAllFuturesIndependently(CompletableFuture<Long> completableFuture1,
 			CompletableFuture<BigInteger> completableFuture2, CompletableFuture<Long> completableFuture3,
 			CompletableFuture<BigInteger> completableFuture4) {
-		return Arrays.asList(completableFuture1.join(), completableFuture2.join(), completableFuture3.join(),
-				completableFuture4.join());
+		
+		CompletableFuture<Void> allOf = CompletableFuture.allOf(completableFuture1, completableFuture2,
+				completableFuture3, completableFuture4);
+		
+		Stream<Number> streamOfFutures = Stream
+				.of(completableFuture1, completableFuture2, completableFuture3, completableFuture4)
+				.map(CompletableFuture::join);
+		
+		return allOf.thenApply(empty -> streamOfFutures.collect(Collectors.toList())).join();
 	}
 }
